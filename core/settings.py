@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from core.utils import ConfigHelper
+from datetime import timedelta
 from pathlib import Path
 
 
@@ -43,6 +44,9 @@ INSTALLED_APPS = [
     # Rest Framework
     'rest_framework',
     'corsheaders',
+
+    # Apps
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +144,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'accounts.User'
+
+# Rest Framework Config
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+# JWT Config
+SIMPLE_JWT = {
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=1)
+}
