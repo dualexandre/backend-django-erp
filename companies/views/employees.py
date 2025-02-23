@@ -13,11 +13,11 @@ class Employees(Base):
 
     def get(self, request):
         enterprise_id = self.get_enterprise_id(request.user.id)
-        owner_id = Enterprise.objects.values('user_id').filter(id=enterprise_id).first()['user_id']
-        employees = Employee.objects.filter(enterprise_id=enterprise_id).exclude(user_id=owner_id).all()
+        owner_id = Enterprise.objects.values('user_id').filter(id = enterprise_id).first()['user_id']
+        employees = Employee.objects.filter(enterprise_id = enterprise_id).exclude(user_id = owner_id).all()
 
-        serializer = EmployeesSerializer(employees, many=True)
-        return Response({"employees": serializer.data})
+        serializer = EmployeesSerializer(employees, many = True)
+        return Response({'employees': serializer.data})
 
 
     def post(self, request):
@@ -28,17 +28,17 @@ class Employees(Base):
         enterprise_id = self.get_enterprise_id(request.user.id)
         signup_user = Authentication.signup(
             self,
-            name=name,
-            email=email,
-            password=password,
-            type_account='employee',
-            company_id=enterprise_id
+            name = name,
+            email = email,
+            password = password,
+            type_account = 'employee',
+            company_id = enterprise_id
         )
 
         if isinstance(signup_user, User):
-            return Response({"success": True}, status=status.HTTP_201_CREATED)
+            return Response({'success': True}, status = status.HTTP_201_CREATED)
         
-        return Response(signup_user, status=status.HTTP_400_BAD_REQUEST)
+        return Response(signup_user, status = status.HTTP_400_BAD_REQUEST)
 
 
 class EmployeeDetail(Base):
@@ -57,15 +57,15 @@ class EmployeeDetail(Base):
         name = request.data.get('name') or employee.user.name
         email = request.data.get('email') or employee.user.email
 
-        if email != employee.user.email and User.objects.filter(email=email).exists():
-            raise APIException("Esse email já está em uso", code="email_already_use")
+        if email != employee.user.email and User.objects.filter(email = email).exists():
+            raise APIException('Esse email já está em uso', code = 'email_already_use')
         
-        User.objects.filter(id=employee.user.id).update(
-            name=name,
-            email=email
+        User.objects.filter(id = employee.user.id).update(
+            name = name,
+            email = email
         )
 
-        User_Groups.objects.filter(user_id=employee.user.id).delete()
+        User_Groups.objects.filter(user_id = employee.user.id).delete()
 
         if groups:
             # 1,2,3,4 -> [1, 2, 3, 4]
@@ -74,22 +74,22 @@ class EmployeeDetail(Base):
             for group_id in groups:
                 self.get_group(group_id, employee.enterprise.id)
                 User_Groups.objects.create(
-                    group_id=group_id,
-                    user_id=employee.user.id
+                    group_id = group_id,
+                    user_id = employee.user.id
                 )
 
-        return Response({"success": True})
+        return Response({'success': True})
 
 
     def delete(self, request, employee_id):
         employee = self.get_employee(employee_id, request.user.id)
 
-        check_if_owner = User.objects.filter(id=employee.user.id, is_owner=1).exists()
+        check_if_owner = User.objects.filter(id = employee.user.id, is_owner = 1).exists()
 
         if check_if_owner:
             raise APIException('Você não pode demitir o dono da empresa')
         
         employee.delete()
         
-        User.objects.filter(id=employee.user.id).delete()
-        return Response({"success": True})
+        User.objects.filter(id = employee.user.id).delete()
+        return Response({'success': True})
