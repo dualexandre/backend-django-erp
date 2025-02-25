@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from accounts.models import User_Groups, Group_Permisions
+from accounts.models import User_Groups, Group_Permissions
 from django.contrib.auth.models import Permission
 
 def check_permission(user, method, permission_to):
@@ -19,7 +19,7 @@ def check_permission(user, method, permission_to):
 
     groups = User_Groups.objects.values('group_id').filter(user_id = user.id).all()
     for group in groups:
-        permissions = Group_Permisions.objects.values('permission_id').filter(group_id = group['group_id']).all()
+        permissions = Group_Permissions.objects.values('permission_id').filter(group_id = group['group_id']).all()
         for permission in permissions:
             if Permission.objects.filter(id = permission['permission_id'], codename = required_permission).exists():
                 return True

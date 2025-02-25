@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.exceptions import APIException
 from companies.models import Enterprise, Employee
-from accounts.models import User_Groups, Group_Permisions
+from accounts.models import User_Groups, Group_Permissions
 
 
 class Base(APIView):
@@ -22,7 +22,7 @@ class Base(APIView):
         for g in groups:
             group = g.group
 
-            permissions = Group_Permisions.objects.filter(group_id = group.id).all()
+            permissions = Group_Permissions.objects.filter(group_id = group.id).all()
             for p in permissions:
                 enterprise['permissions'].append({
                     'id': p.permission.id,
